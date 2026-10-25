@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>English Quest 2–4</title>
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<div id="app">
+
+  <!-- ЭКРАН ЗАГРУЗКИ -->
+  <section id="screen-loading" class="screen active">
+    <div class="card">
+      <div class="emoji-big">🇬🇧🚀</div>
+      <h1>English Quest</h1>
+      <p class="sub" id="loading-text">Загрузка…</p>
+    </div>
+  </section>
+
+  <!-- АВТОРИЗАЦИЯ -->
+  <section id="screen-auth" class="screen">
+    <div class="card">
+      <div class="emoji-big">🔐</div>
+      <h1 id="auth-title">Вход</h1>
+      <p class="sub" id="auth-sub">Войди, чтобы сохранять прогресс на всех устройствах</p>
+      <input id="auth-email" class="input" type="email" placeholder="Email" autocomplete="email">
+      <input id="auth-password" class="input" type="password" placeholder="Пароль (мин. 6 символов)" autocomplete="current-password">
+      <button id="auth-submit" class="btn primary">Войти</button>
+      <button id="auth-switch" class="btn ghost" style="margin-top:10px">Создать аккаунт</button>
+      <button id="auth-skip" class="btn ghost" style="margin-top:10px">Продолжить без аккаунта</button>
+      <div id="auth-error" class="auth-error"></div>
+    </div>
+  </section>
+
+  <!-- ГЛАВНЫЙ ЭКРАН -->
+  <section id="screen-home" class="screen">
+    <div class="card">
+      <div class="top-row">
+        <span id="home-user" class="user-chip">👤 Гость</span>
+        <button id="btn-logout" class="btn tiny ghost" hidden>Выйти</button>
+      </div>
+      <div class="emoji-big">🏰⚔️</div>
+      <h1>English Quest</h1>
+      <p class="sub" id="home-grade-label">Выбери класс</p>
+      <div id="grade-selector" class="grade-selector"></div>
+      <div class="home-grid">
+        <button class="home-btn" data-mode="quiz">🎯<span>Тренировка</span></button>
+        <button class="home-btn" data-mode="learn">📚<span>Новые слова</span></button>
+        <button class="home-btn" data-mode="review">🔁<span>Повторение</span></button>
+        <button class="home-btn" data-mode="grammar">🧠<span>Грамматика</span></button>
+        <button class="home-btn" data-mode="dictionary">📖<span>Словарик</span></button>
+        <button class="home-btn" data-mode="goals">🎯<span>Цели недели</span><span class="badge" id="goals-badge" hidden></span></button>
+        <button class="home-btn" data-mode="knight">⚔️<span>Мой рыцарь</span></button>
+        <button class="home-btn" data-mode="stickers">🏆<span>Стикеры</span></button>
+        <button class="home-btn" data-mode="history">📈<span>Прогресс</span></button>
+      </div>
+      <div class="home-summary" id="home-summary"></div>
+    </div>
+  </section>
+
+  <!-- ЭКРАН ВЫБОРА ТЕМЫ (квиз/учить) -->
+  <section id="screen-topics" class="screen">
+    <div class="card">
+      <h1 id="topics-title">Выбери тему</h1>
+      <p class="sub" id="topics-sub"></p>
+      <div id="topics-grid" class="topic-grid"></div>
+      <div id="topics-extra" class="note" hidden></div>
+      <button class="btn primary" id="btn-topics-start" style="margin-top:14px">Начать</button>
+      <button class="btn ghost" id="btn-topics-back" style="width:100%;margin-top:10px">← Назад</button>
+    </div>
+  </section>
+
+  <!-- КВИЗ -->
+  <section id="screen-quiz" class="screen">
+    <div class="card">
+      <div class="topbar"><span id="q-counter">1 / 20</span><span id="q-live">✅ 0 · 🔥 0</span></div>
+      <div class="progress"><div id="q-progress"></div></div>
+      <div class="direction" id="q-direction"></div>
+      <div class="word" id="q-word">…</div>
+      <div id="q-options" class="options"></div>
+      <div id="q-feedback" class="feedback"></div>
+    </div>
+  </section>
+
+  <!-- РЕЗУЛЬТАТ КВИЗА -->
+  <section id="screen-quiz-result" class="screen"><div class="card" id="quiz-result-card"></div></section>
+
+  <!-- КАРТОЧКА СЛОВА -->
+  <section id="screen-learn" class="screen">
+    <div class="card">
+      <div class="learn-counter" id="learn-counter"></div>
+      <div class="progress"><div id="learn-progress"></div></div>
+      <div class="learn-card">
+        <div class="learn-level" id="learn-level"></div>
+        <div class="learn-word" id="learn-word"></div>
+        <div class="learn-translation" id="learn-translation"></div>
+        <div class="learn-example" id="learn-example"></div>
+      </div>
+      <div class="speak-row">
+        <button class="speak-btn" id="btn-listen">🔊 Послушать</button>
+        <button class="speak-btn" id="btn-speak">🎤 Сказать</button>
+      </div>
+      <div id="pron-result"></div>
+      <button class="btn primary" id="btn-learn-next" style="margin-top:16px">Дальше →</button>
+    </div>
+  </section>
+
+  <!-- УЧЁБА ЗАВЕРШЕНА -->
+  <section id="screen-learn-done" class="screen"><div class="card" id="learn-done-card"></div></section>
+
+  <!-- ПОВТОРЕНИЕ (SM-2) -->
+  <section id="screen-review" class="screen">
+    <div class="card">
+      <div class="learn-counter" id="review-counter"></div>
+      <div class="progress"><div id="review-progress"></div></div>
+      <div class="learn-card">
+        <div class="learn-level" id="review-level"></div>
+        <div class="learn-word" id="review-word"></div>
+        <div class="learn-translation" id="review-translation"></div>
+        <div class="learn-example" id="review-example"></div>
+      </div>
+      <p class="sub" style="margin:10px 0">Насколько легко вспомнил слово?</p>
+      <div class="review-buttons">
+        <button class="btn ghost" data-q="0">😵 Забыл</button>
+        <button class="btn ghost" data-q="1">🤔 Трудно</button>
+        <button class="btn ghost" data-q="2">🙂 Нормально</button>
+        <button class="btn primary" data-q="3">😎 Легко</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ГРАММАТИКА: СПИСОК -->
+  <section id="screen-grammar-list" class="screen">
+    <div class="card">
+      <div class="emoji-big">🧠</div>
+      <h1>Грамматика</h1>
+      <p class="sub" id="grammar-sub">Темы для выбранного класса</p>
+      <div id="grammar-lessons"></div>
+      <button class="btn ghost" id="btn-grammar-back" style="width:100%;margin-top:14px">← На главную</button>
+    </div>
+  </section>
+
+  <!-- ГРАММАТИКА: УРОК -->
+  <section id="screen-grammar-lesson" class="screen"><div class="card" id="grammar-lesson-card"></div></section>
+
+  <!-- СЛОВАРИК -->
+  <section id="screen-dictionary" class="screen">
+    <div class="card">
+      <h1>📖 Словарик</h1>
+      <div class="sub" id="dict-sub"></div>
+      <div id="dict-filter" class="dict-filter"></div>
+      <div id="dict-list"></div>
+      <button class="btn primary" id="btn-dict-practice" style="margin-top:14px">🎯 Тренировать слова</button>
+      <button class="btn ghost" id="btn-dict-back" style="width:100%;margin-top:10px">← На главную</button>
+    </div>
+  </section>
+
+  <!-- ЦЕЛИ -->
+  <section id="screen-goals" class="screen">
+    <div class="card">
+      <div class="emoji-big">🎯</div>
+      <h1>Цели недели</h1>
+      <div class="sub">Выполняй цели — получай предметы для рыцаря</div>
+      <div class="week-banner" id="goals-banner"></div>
+      <div id="goals-list"></div>
+      <button class="btn primary" id="btn-goals-knight" style="margin-top:6px">⚔️ К рыцарю</button>
+      <button class="btn ghost" id="btn-goals-back" style="width:100%;margin-top:10px">← На главную</button>
+    </div>
+  </section>
+
+  <!-- РЫЦАРЬ -->
+  <section id="screen-knight" class="screen">
+    <div class="card">
+      <div class="emoji-big">⚔️</div>
+      <h1>Мой рыцарь</h1>
+      <div class="sub">Собирай снаряжение, выполняя цели</div>
+      <div class="knight-scene">
+        <div class="scene-row scene-castle" id="scene-castle">🏕️</div>
+        <div class="scene-row scene-knight" id="scene-knight">🤺</div>
+        <div class="scene-row scene-horse" id="scene-horse">…</div>
+        <div class="scene-row scene-weapons" id="scene-weapons">…</div>
+        <div class="scene-label" id="scene-label"></div>
+      </div>
+      <div class="knight-summary" id="knight-summary"></div>
+      <div id="knight-categories"></div>
+      <button class="btn primary" id="btn-knight-goals" style="margin-top:8px">🎯 К целям недели</button>
+      <button class="btn ghost" id="btn-knight-back" style="width:100%;margin-top:10px">← На главную</button>
+    </div>
+  </section>
+
+  <!-- СТИКЕРЫ -->
+  <section id="screen-stickers" class="screen"><div class="card" id="stickers-card"></div></section>
+
+  <!-- ИСТОРИЯ -->
+  <section id="screen-history" class="screen"><div class="card" id="history-card"></div></section>
+
+  <!-- ТОСТ -->
+  <div id="toast-container"></div>
+</div>
+
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
