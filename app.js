@@ -768,6 +768,9 @@
     $('#auth-skip').addEventListener('click', () => { showScreen('home'); renderHome(); });
     $('#btn-logout').addEventListener('click', logout);
     
+	    // Внутри bindEvents() добавьте:
+    $('#btn-speak').addEventListener('click', pronounceCurrent); // Для микрофона
+	
     // ДОБАВЛЯЕМ КНОПКУ ВОЙТИ:
     $('#btn-login').addEventListener('click', () => {
       if (!S.supabase) {
@@ -817,6 +820,173 @@
     $('#btn-knight-goals').addEventListener('click', () => renderGoals());
   }
 
+  /* ============================================================
+     РАСПОЗНАВАНИЕ РЕЧИ (Speech Recognition)
+     ============================================================ */
+  function levenshtein(a, b) {
+    if (a === b) return 0;
+    if (!a.length) return b.length;
+    if (!b.length) return a.length;
+    let prev = new Array(b.length + 1), cur = new Array(b.length + 1);
+    for (let j = 0; j <= b.length; j++) prev[j] = j;
+    for (let i = 1; i <= a.length; i++) {
+      cur[0] = i;
+      for (let j = 1; j <= b.length; j++) {
+        const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+        cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + cost);
+      }
+      [prev, cur] = [cur, prev];
+    }
+    return prev[b.length];
+  }
+
+  function pronounceCurrent() {
+    const w = S.learnQueue[S.learnIdx];
+    if (!w) return;
+    
+    // Проверка поддержки
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) {
+      $('#pron-result').innerHTML = '<div class="pron-result fail">🎤 Браузер не поддерживает микрофон. Используйте Chrome или Edge.</div>';
+      return;
+    }
+
+    const btn = $('#btn-speak');
+    btn.disabled = true;
+    btn.classList.add('listening');
+    btn.textContent = '🎤 Слушаю...';
+    $('#pron-result').innerHTML = '';
+    window.speechSynthesis.cancel();
+
+    const rec = new SR();
+    rec.lang = 'en-US';
+    rec.interimResults = false;
+    rec.maxAlternatives = 1;
+
+    rec.onresult = (e) => {
+      const transcript = e.results[0][0].transcript;
+      const norm = (s) => s.toLowerCase().replace(/[^a-z0-9\s']/g, '').trim().replace(/\s+/g, ' ');
+      const targetNorm = norm(w.en);
+      const transcriptNorm = norm(transcript);
+      const dist = levenshtein(targetNorm, transcriptNorm);
+      const maxLen = Math.max(targetNorm.length, transcriptNorm.length, 1);
+      
+      let html = '';
+      if (dist === 0) {
+        html = `<div class="pron-result ok">✅ Отлично! Я услышал: «${transcript}»</div>`;
+        speak('Correct!');
+      } else if (dist <= 2 && (1 - dist / maxLen) >= 0.75) {
+        html = `<div class="pron-result almost">⚠️ Почти! Я услышал: «${transcript}»<small>Попробуй ещё раз.</small></div>`;
+      } else {
+        html = `<div class="pron-result fail">❌ Не совпало. Я услышал: «${transcript}»<small>Послушай и повтори.</small></div>`;
+      }
+      $('#pron-result').innerHTML = html;
+    };
+
+    rec.onerror = (e) => {
+      $('#pron-result').innerHTML = `<div class="pron-result fail">🎤 Ошибка: ${e.error}. Разрешите доступ к микрофону.</div>`;
+    };
+
+    rec.onend = () => {
+      btn.disabled = false;
+      btn.classList.remove('listening');
+      btn.textContent = '🎤 Сказать';
+    };
+
+    rec.start();
+  }
+
+  /* ============================================================
+     ОТРИСОВКА ЦЕЛЕЙ И РЫЦАРЯ
+     ============================================================ */
+  function renderGoals() {
+    const wk = new Date(weekStart()).toISOString().slice(0, 10);
+    if (!S.weekly[wk]) S.weekly[wk] = { goals: {}, bonus: false };
+    const data = S.weekly[wk];
+    const daysLeft = 7 - Math.floor((Date.now() - weekStart()) / (1000 * 60 * 60 * 24));
+    
+    $('#goals-banner').innerHTML = `Неделя с <b>${fmtDate(weekStart())}</b> · осталось дней: <b>${daysLeft}</b><br>За каждую цель — <b>предмет рыцаря</b>. За все три — <b>легендарный бонус</b>!`;
+    
+    const list = $('#goals-list');
+    list.innerHTML = '';
+    
+    GOALS.forEach(g => {
+      const cur = data.goals[g.key] || { awarded: false };
+      const prog = getGoalProgress(g.key);
+      const pctDone = Math.min(100, Math.round(prog / g.target * 100));
+      const done = cur.awarded;
+      
+      const card = document.createElement('div');
+      card.className = 'goal-card' + (done ? ' done' : '');
+      card.innerHTML = `
+        <div class="goal-head">
+          <div class="goal-title"><span class="goal-emoji">${g.emoji}</span>${g.title}</div>
+          <div class="goal-reward${done ? ' done' : ''}">${done ? '✓ Выполнено' : '🎁 +предмет'}</div>
+        </div>
+        <div class="goal-progress-wrap"><div class="goal-progress-bar" style="width:${pctDone}%"></div></div>
+        <div class="goal-progress-text"><span>${Math.min(prog, g.target)} / ${g.target}</span><span class="pct">${pctDone}%</span></div>
+      `;
+      list.appendChild(card);
+    });
+    showScreen('goals');
+  }
+
+  function renderKnight() {
+    const ownedSet = {};
+    S.knight.forEach(id => ownedSet[id] = true);
+    const total = KNIGHT_ITEMS.length;
+    const have = S.knight.length;
+
+    const bestOf = (cat) => {
+      const items = KNIGHT_ITEMS.filter(i => i.cat === cat && ownedSet[i.id]);
+      return items.length ? items.sort((a, b) => b.tier - a.tier)[0] : null;
+    };
+
+    const castle = bestOf('castle'), armor = bestOf('armor'), horse = bestOf('horse');
+    const sword = bestOf('sword'), shield = bestOf('shield'), helmet = bestOf('helmet'), relic = bestOf('relic');
+
+    $('#scene-castle').textContent = castle ? castle.emoji : '🏕️';
+    $('#scene-knight').textContent = armor ? armor.emoji : '🤺';
+    $('#scene-horse').textContent = horse ? horse.emoji : '—';
+    
+    let weapons = [];
+    if (sword) weapons.push(sword.emoji);
+    if (shield) weapons.push(shield.emoji);
+    if (helmet) weapons.push(helmet.emoji);
+    if (relic) weapons.push(relic.emoji);
+    $('#scene-weapons').textContent = weapons.length ? weapons.join(' ') : '—';
+    $('#scene-label').textContent = have === 0 ? 'Выполни цели недели — собери снаряжение!' : `Предметов собрано: ${have} из ${total}`;
+    $('#knight-summary').innerHTML = `Всего предметов: <b>${have} из ${total}</b> (${Math.round(have / total * 100)}%)<br>Собери всю коллекцию — стань <b>легендарным рыцарем</b>!`;
+
+    const cats = ['sword', 'shield', 'helmet', 'armor', 'horse', 'castle', 'relic'];
+    const catBox = $('#knight-categories');
+    catBox.innerHTML = '';
+
+    cats.forEach(cat => {
+      const items = KNIGHT_ITEMS.filter(i => i.cat === cat);
+      const catOwned = items.filter(i => ownedSet[i.id]).length;
+      const catWrap = document.createElement('div');
+      catWrap.className = 'knight-cat';
+      catWrap.innerHTML = `<div class="knight-cat-head"><span>${CATEGORY_NAMES[cat]}</span><span class="cat-progress">${catOwned}/${items.length}</span></div>`;
+      
+      const grid = document.createElement('div');
+      grid.className = 'knight-item-grid';
+      items.forEach(it => {
+        const isOwned = !!ownedSet[it.id];
+        const el = document.createElement('div');
+        el.className = 'knight-item' + (isOwned ? ' owned tier-' + it.tier : ' locked');
+        el.innerHTML = `
+          <span class="ki-emoji">${isOwned ? it.emoji : '❓'}</span>
+          <span class="ki-name">${isOwned ? it.name : '???'}</span>
+          ${isOwned ? '<span class="ki-check">✓</span>' : ''}
+        `;
+        grid.appendChild(el);
+      });
+      catWrap.appendChild(grid);
+      catBox.appendChild(catWrap);
+    });
+    showScreen('knight');
+  }
   // Запуск
   init();
 })();
