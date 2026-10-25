@@ -29,10 +29,23 @@
       <input id="auth-password" class="input" type="password" placeholder="Пароль (мин. 6 символов)" autocomplete="current-password">
       <button id="auth-submit" class="btn primary">Войти</button>
       <button id="auth-switch" class="btn ghost" style="margin-top:10px">Создать аккаунт</button>
+	  <button id="auth-forgot" class="btn tiny ghost" style="margin-top:15px; padding:8px 12px; font-size:.85rem;">Забыли пароль?</button>
       <button id="auth-skip" class="btn ghost" style="margin-top:10px">Продолжить без аккаунта</button>
       <div id="auth-error" class="auth-error"></div>
     </div>
   </section>
+  
+  <!-- ЭКРАН СБРОСА ПАРОЛЯ -->
+<section id="screen-reset" class="screen">
+  <div class="card">
+    <div class="emoji-big">🔑</div>
+    <h1>Новый пароль</h1>
+    <p class="sub">Придумай новый пароль для входа</p>
+    <input id="reset-password" class="input" type="password" placeholder="Новый пароль (мин. 6 символов)">
+    <button id="btn-reset-submit" class="btn primary">Сохранить пароль</button>
+    <div id="reset-error" class="auth-error"></div>
+  </div>
+</section>
 
   <!-- ГЛАВНЫЙ ЭКРАН -->
   <section id="screen-home" class="screen">

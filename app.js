@@ -94,22 +94,31 @@
   /* ============================================================
      2. АВТОРИЗАЦИЯ (Supabase)
      ============================================================ */
-    async function initSupabase() {
-    if (!CFG.SUPABASE_URL || !CFG.SUPABASE_ANON_KEY) {
-      console.warn('Supabase keys are missing in config.js');
-      return null;
-    }
-    if (typeof window.supabase === 'undefined') {
-      console.warn('Supabase SDK is not loaded. Check internet connection.');
-      return null;
-    }
+      async function initSupabase() {
+    if (!CFG.SUPABASE_URL || !CFG.SUPABASE_ANON_KEY) return null;
     const client = window.supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_ANON_KEY);
-    const { data: { session } } = await client.auth.getSession();
-    if (session && session.user) { S.user = session.user; await loadFromCloud(); }
-    client.auth.onAuthStateChange(async (event, sess) => {
-      if (sess && sess.user) { S.user = sess.user; await loadFromCloud(); renderHome(); }
-      else { S.user = null; renderHome(); }
+    
+    // Слушаем изменения авторизации
+    client.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        // Пользователь перешёл по ссылке сброса пароля
+        showScreen('reset');
+      } else if (session && session.user) {
+        S.user = session.user;
+        await loadFromCloud();
+        renderHome();
+      } else {
+        S.user = null;
+        renderHome();
+      }
     });
+
+    // Проверяем текущую сессию при загрузке
+    const { data: { session } } = await client.auth.getSession();
+    if (session && session.user) {
+      S.user = session.user;
+      await loadFromCloud();
+    }
     return client;
   }
 
@@ -761,6 +770,43 @@
     bindEvents();
   }
 
+	  /* ============================================================
+     СБРОС ПАРОЛЯ
+     ============================================================ */
+  async function sendResetEmail() {
+    const email = $('#auth-email').value.trim();
+    if (!email) { toast('Введите email', 'gold'); return; }
+    if (!S.supabase) { toast('Supabase не настроен', 'gold'); return; }
+
+    const { error } = await S.supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + window.location.pathname
+    });
+
+    if (error) {
+      $('#auth-error').textContent = error.message;
+    } else {
+      toast('Письмо для сброса пароля отправлено!', 'gold');
+      $('#auth-error').textContent = 'Проверьте почту';
+    }
+  }
+
+  async function handlePasswordReset(newPassword) {
+    if (newPassword.length < 6) {
+      $('#reset-error').textContent = 'Пароль должен быть не менее 6 символов';
+      return;
+    }
+    if (!S.supabase) return;
+
+    const { error } = await S.supabase.auth.updateUser({ password: newPassword });
+    if (error) {
+      $('#reset-error').textContent = error.message;
+    } else {
+      toast('Пароль успешно изменён! Теперь можно войти.', 'gold');
+      showScreen('home');
+      renderHome();
+    }
+  }
+
     function bindEvents() {
     // Auth
     $('#auth-submit').addEventListener('click', authSubmit);
@@ -775,6 +821,14 @@
     
 	    // Внутри bindEvents() добавьте:
     $('#btn-speak').addEventListener('click', pronounceCurrent); // Для микрофона
+	
+	    // Обработчик кнопки "Забыли пароль?"
+    $('#auth-forgot').addEventListener('click', sendResetEmail);
+
+    // Обработчик сохранения нового пароля
+    $('#btn-reset-submit').addEventListener('click', () => {
+      handlePasswordReset($('#reset-password').value);
+    });
 	
     // ДОБАВЛЯЕМ КНОПКУ ВОЙТИ:
     $('#btn-login').addEventListener('click', () => {
