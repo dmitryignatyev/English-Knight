@@ -1,0 +1,136 @@
+{
+  "topics": [
+    {
+      "id": "to_be",
+      "grade": 2,
+      "title": "Глагол to be (am / is / are)",
+      "subtitle": "Present Simple",
+      "intro": "Глагол <b>to be</b> переводится как «быть», но в русском мы его часто опускаем. В английском он обязателен: <b>I am</b> a pupil, <b>she is</b> happy.",
+      "markers": ["I", "you", "he", "she", "it", "we", "they"],
+      "rules": [
+        { "h": "Утверждение", "p": "<b>I am</b> · <b>He / She / It is</b> · <b>You / We / They are</b>", "ex": "I am nine. She is my sister." },
+        { "h": "Отрицание", "p": "am / is / are + <b>not</b> (сокращённо: isn't, aren't)", "ex": "He is not sad. We aren't late." },
+        { "h": "Вопрос", "p": "Am / Is / Are + подлежащее", "ex": "Are you happy? Is she at home?" }
+      ],
+      "exercises": [
+        { "s": "I ___ a pupil.", "o": ["am", "is", "are"], "c": "am", "e": "I → am." },
+        { "s": "She ___ my sister.", "o": ["am", "is", "are"], "c": "is", "e": "She → is." },
+        { "s": "They ___ at school.", "o": ["am", "is", "are"], "c": "are", "e": "They → are." },
+        { "s": "He ___ not sad.", "o": ["am", "is", "are"], "c": "is", "e": "He → is." },
+        { "s": "___ you happy?", "o": ["Am", "Is", "Are"], "c": "Are", "e": "You → are. Вопрос начинается с Are." }
+      ]
+    },
+    {
+      "id": "present_simple",
+      "grade": 3,
+      "title": "Present Simple",
+      "subtitle": "Настоящее простое время",
+      "intro": "Present Simple нужен для <b>регулярных действий</b>, <b>фактов</b> и <b>привычек</b>.",
+      "markers": ["every day", "usually", "always", "often", "sometimes", "never"],
+      "rules": [
+        { "h": "Утверждение", "p": "<b>I / you / we / they</b> + глагол. <b>He / she / it</b> + глагол + <b>s</b>.", "ex": "I play. She plays." },
+        { "h": "Отрицание", "p": "<b>don't</b> / <b>doesn't</b> + глагол.", "ex": "I don't like milk. He doesn't like tea." },
+        { "h": "Вопрос", "p": "<b>Do / Does</b> + подлежащее + глагол.", "ex": "Do you play? Does she like pizza?" }
+      ],
+      "exercises": [
+        { "s": "She ___ pizza every day.", "o": ["like", "likes", "is liking"], "c": "likes", "e": "He/she/it → глагол + s." },
+        { "s": "They ___ football in the park.", "o": ["plays", "play", "is play"], "c": "play", "e": "They → глагол без s." },
+        { "s": "___ you like ice cream?", "o": ["Does", "Do", "Are"], "c": "Do", "e": "Вопрос с you → Do." },
+        { "s": "He ___ like broccoli.", "o": ["don't", "doesn't", "isn't"], "c": "doesn't", "e": "Отрицание с he → doesn't." },
+        { "s": "I ___ to school every day.", "o": ["goes", "go", "going"], "c": "go", "e": "I → глагол без s." }
+      ]
+    },
+    {
+      "id": "present_continuous",
+      "grade": 3,
+      "title": "Present Continuous",
+      "subtitle": "Настоящее длительное время",
+      "intro": "Present Continuous нужен, когда действие происходит <b>прямо сейчас</b>.",
+      "markers": ["now", "at the moment", "Look!", "Listen!"],
+      "rules": [
+        { "h": "Утверждение", "p": "<b>am / is / are</b> + глагол + <b>ing</b>.", "ex": "I am reading now. She is dancing." },
+        { "h": "Отрицание", "p": "<b>am / is / are + not</b> + глагол + ing.", "ex": "I am not sleeping. He isn't playing." },
+        { "h": "Вопрос", "p": "<b>Am / Is / Are</b> + подлежащее + глагол + ing.", "ex": "Are you reading? Is she dancing?" }
+      ],
+      "exercises": [
+        { "s": "Look! She ___ (dance).", "o": ["dances", "is dancing", "dance"], "c": "is dancing", "e": "Look! → действие сейчас → is + глагол-ing." },
+        { "s": "I ___ (read) now.", "o": ["read", "am reading", "is reading"], "c": "am reading", "e": "I → am + глагол-ing." },
+        { "s": "They ___ (play) football now.", "o": ["play", "is playing", "are playing"], "c": "are playing", "e": "They → are + глагол-ing." },
+        { "s": "He ___ (not sleep) now.", "o": ["doesn't sleep", "isn't sleeping", "not sleeping"], "c": "isn't sleeping", "e": "He → isn't + глагол-ing." }
+      ]
+    },
+    {
+      "id": "past_simple",
+      "grade": 4,
+      "title": "Past Simple",
+      "subtitle": "Прошедшее простое время",
+      "intro": "Past Simple нужен для действий, которые <b>закончились в прошлом</b>.",
+      "markers": ["yesterday", "last week", "two days ago", "in 2020"],
+      "rules": [
+        { "h": "Утверждение", "p": "Правильные глаголы: глагол + <b>-ed</b>. Неправильные — особые формы.", "ex": "I played. She went." },
+        { "h": "Отрицание", "p": "<b>did not (didn't)</b> + глагол.", "ex": "I didn't play. She didn't go." },
+        { "h": "Вопрос", "p": "<b>Did</b> + подлежащее + глагол.", "ex": "Did you play? Did she go?" }
+      ],
+      "exercises": [
+        { "s": "Yesterday I ___ football.", "o": ["play", "played", "playing"], "c": "played", "e": "Yesterday → Past Simple. Правильный глагол → + ed." },
+        { "s": "She ___ to the cinema last week.", "o": ["go", "went", "goes"], "c": "went", "e": "Go — неправильный глагол, Past Simple = went." },
+        { "s": "We ___ not watch TV yesterday.", "o": ["do", "did", "does"], "c": "did", "e": "Отрицание в Past Simple → didn't." },
+        { "s": "___ you visit your grandmother?", "o": ["Do", "Did", "Are"], "c": "Did", "e": "Вопрос в Past Simple → Did." }
+      ]
+    },
+    {
+      "id": "future_simple",
+      "grade": 4,
+      "title": "Future Simple (will)",
+      "subtitle": "Простое будущее время",
+      "intro": "Future Simple нужен для действий в будущем. Используем <b>will</b>.",
+      "markers": ["tomorrow", "next week", "in the future"],
+      "rules": [
+        { "h": "Утверждение", "p": "<b>will</b> + глагол.", "ex": "I will play. She will go." },
+        { "h": "Отрицание", "p": "<b>will not (won't)</b> + глагол.", "ex": "I won't play. She won't go." },
+        { "h": "Вопрос", "p": "<b>Will</b> + подлежащее + глагол.", "ex": "Will you play? Will she go?" }
+      ],
+      "exercises": [
+        { "s": "Tomorrow I ___ go to the park.", "o": ["will", "am", "do"], "c": "will", "e": "Будущее → will + глагол." },
+        { "s": "She ___ not come to the party.", "o": ["will", "is", "does"], "c": "will", "e": "Отрицание в будущем → will not (won't)." },
+        { "s": "___ you help me tomorrow?", "o": ["Do", "Will", "Are"], "c": "Will", "e": "Вопрос в будущем → Will." }
+      ]
+    },
+    {
+      "id": "comparatives",
+      "grade": 4,
+      "title": "Степени сравнения",
+      "subtitle": "Comparatives & Superlatives",
+      "intro": "Сравниваем предметы: <b>bigger</b> (больше), <b>the biggest</b> (самый большой).",
+      "markers": ["than", "the ...est"],
+      "rules": [
+        { "h": "Сравнительная", "p": "Короткие слова: + <b>-er</b>. Длинные: <b>more</b> + слово.", "ex": "A cat is smaller than a dog. This book is more interesting." },
+        { "h": "Превосходная", "p": "Короткие: <b>the ...-est</b>. Длинные: <b>the most</b> + слово.", "ex": "He is the tallest in the class. It is the most beautiful park." }
+      ],
+      "exercises": [
+        { "s": "An elephant is ___ than a mouse.", "o": ["big", "bigger", "the biggest"], "c": "bigger", "e": "Сравнение двух объектов → сравнительная степень: bigger." },
+        { "s": "This is ___ book in the library.", "o": ["interesting", "more interesting", "the most interesting"], "c": "the most interesting", "e": "Превосходная степень для длинного слова → the most interesting." },
+        { "s": "She is ___ than her brother.", "o": ["tall", "taller", "the tallest"], "c": "taller", "e": "Сравнение → taller." }
+      ]
+    },
+    {
+      "id": "prepositions",
+      "grade": 2,
+      "title": "Предлоги места",
+      "subtitle": "Prepositions of place",
+      "intro": "Предлоги показывают, <b>где</b> находится предмет: in, on, under, behind, next to.",
+      "markers": ["in", "on", "under", "behind", "next to"],
+      "rules": [
+        { "h": "in", "p": "Внутри чего-то.", "ex": "The cat is in the box." },
+        { "h": "on", "p": "На поверхности.", "ex": "The book is on the table." },
+        { "h": "under", "p": "Под чем-то.", "ex": "The ball is under the chair." },
+        { "h": "behind", "p": "За чем-то.", "ex": "The tree is behind the house." }
+      ],
+      "exercises": [
+        { "s": "The pen is ___ the desk.", "o": ["in", "on", "under"], "c": "on", "e": "На поверхности → on." },
+        { "s": "The cat is ___ the box.", "o": ["in", "on", "behind"], "c": "in", "e": "Внутри → in." },
+        { "s": "The ball is ___ the chair.", "o": ["on", "under", "next to"], "c": "under", "e": "Под → under." }
+      ]
+    }
+  ]
+}
