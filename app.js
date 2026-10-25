@@ -709,6 +709,11 @@
     { id: 's19', emoji: '🦸‍♂️🐻', name: 'Супермедведь' }
   ];
 
+  const CATEGORY_NAMES = {
+    sword: 'Меч', shield: 'Щит', helmet: 'Шлем', armor: 'Доспех',
+    horse: 'Конь', castle: 'Замок', relic: 'Реликвии'
+  };
+
   const KNIGHT_ITEMS = [
     { id: 'sword_1', cat: 'sword', tier: 1, emoji: '🗡️', name: 'Деревянный меч' },
     { id: 'sword_2', cat: 'sword', tier: 2, emoji: '⚔️', name: 'Железный меч' },
@@ -899,13 +904,21 @@
   /* ============================================================
      ОТРИСОВКА ЦЕЛЕЙ И РЫЦАРЯ
      ============================================================ */
+	 
+    /* ============================================================
+     ОТРИСОВКА ЦЕЛЕЙ И РЫЦАРЯ
+     ============================================================ */
   function renderGoals() {
+    // Безопасная инициализация структуры данных
+    if (!S.weekly || typeof S.weekly !== 'object') S.weekly = {};
     const wk = new Date(weekStart()).toISOString().slice(0, 10);
     if (!S.weekly[wk]) S.weekly[wk] = { goals: {}, bonus: false };
+    if (!S.weekly[wk].goals) S.weekly[wk].goals = {};
+    
     const data = S.weekly[wk];
     const daysLeft = 7 - Math.floor((Date.now() - weekStart()) / (1000 * 60 * 60 * 24));
     
-    $('#goals-banner').innerHTML = `Неделя с <b>${fmtDate(weekStart())}</b> · осталось дней: <b>${daysLeft}</b><br>За каждую цель — <b>предмет рыцаря</b>. За все три — <b>легендарный бонус</b>!`;
+    $('#goals-banner').innerHTML = `Неделя с <b>${fmtDate(weekStart())}</b> · осталось дней: <b>${Math.max(0, daysLeft)}</b><br>За каждую цель — <b>предмет рыцаря</b>. За все три — <b>легендарный бонус</b>!`;
     
     const list = $('#goals-list');
     list.innerHTML = '';
@@ -932,6 +945,9 @@
   }
 
   function renderKnight() {
+    // Защита от пустых данных
+    if (!Array.isArray(S.knight)) S.knight = [];
+    
     const ownedSet = {};
     S.knight.forEach(id => ownedSet[id] = true);
     const total = KNIGHT_ITEMS.length;
@@ -967,7 +983,7 @@
       const catOwned = items.filter(i => ownedSet[i.id]).length;
       const catWrap = document.createElement('div');
       catWrap.className = 'knight-cat';
-      catWrap.innerHTML = `<div class="knight-cat-head"><span>${CATEGORY_NAMES[cat]}</span><span class="cat-progress">${catOwned}/${items.length}</span></div>`;
+      catWrap.innerHTML = `<div class="knight-cat-head"><span>${CATEGORY_NAMES[cat] || cat}</span><span class="cat-progress">${catOwned}/${items.length}</span></div>`;
       
       const grid = document.createElement('div');
       grid.className = 'knight-item-grid';
