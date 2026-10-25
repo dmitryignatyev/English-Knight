@@ -37,10 +37,14 @@
   <!-- ГЛАВНЫЙ ЭКРАН -->
   <section id="screen-home" class="screen">
     <div class="card">
-      <div class="top-row">
-        <span id="home-user" class="user-chip">👤 Гость</span>
-        <button id="btn-logout" class="btn tiny ghost" hidden>Выйти</button>
-      </div>
+    
+<div class="top-row">
+  <div style="display:flex; gap:8px; align-items:center;">
+    <span id="home-user" class="user-chip">👤 Гость</span>
+    <button id="btn-login" class="btn tiny ghost" style="padding:6px 12px; font-size:.75rem;">Войти</button>
+    <button id="btn-logout" class="btn tiny ghost" style="padding:6px 12px; font-size:.75rem;" hidden>Выйти</button>
+  </div>
+</div>
       <div class="emoji-big">🏰⚔️</div>
       <h1>English Quest</h1>
       <p class="sub" id="home-grade-label">Выбери класс</p>

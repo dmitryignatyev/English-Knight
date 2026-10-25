@@ -94,10 +94,16 @@
   /* ============================================================
      2. АВТОРИЗАЦИЯ (Supabase)
      ============================================================ */
-  async function initSupabase() {
-    if (!CFG.SUPABASE_URL || !CFG.SUPABASE_ANON_KEY) return null;
-    if (typeof supabase === 'undefined') { console.warn('Supabase SDK не загружен'); return null; }
-    const client = supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_ANON_KEY);
+    async function initSupabase() {
+    if (!CFG.SUPABASE_URL || !CFG.SUPABASE_ANON_KEY) {
+      console.warn('Supabase keys are missing in config.js');
+      return null;
+    }
+    if (typeof window.supabase === 'undefined') {
+      console.warn('Supabase SDK is not loaded. Check internet connection.');
+      return null;
+    }
+    const client = window.supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_ANON_KEY);
     const { data: { session } } = await client.auth.getSession();
     if (session && session.user) { S.user = session.user; await loadFromCloud(); }
     client.auth.onAuthStateChange(async (event, sess) => {
@@ -106,6 +112,8 @@
     });
     return client;
   }
+
+
 
   async function authSubmit() {
     const email = $('#auth-email').value.trim();
@@ -216,9 +224,12 @@
   /* ============================================================
      5. РЕНДЕР ГЛАВНОГО ЭКРАНА
      ============================================================ */
-  function renderHome() {
-    $('#home-user').textContent = S.user ? ('👤 ' + (S.user.email || '').split('@')[0]) : '👤 Гость';
-    $('#btn-logout').hidden = !S.user;
+    function renderHome() {
+    const isLogged = !!S.user;
+    $('#home-user').textContent = isLogged ? ('👤 ' + (S.user.email || '').split('@')[0]) : '👤 Гость';
+    $('#btn-login').hidden = isLogged;
+    $('#btn-logout').hidden = !isLogged;
+    
     renderGradeSelector();
     updateHomeSummary();
     updateGoalsBadge();
@@ -745,7 +756,7 @@
     bindEvents();
   }
 
-  function bindEvents() {
+    function bindEvents() {
     // Auth
     $('#auth-submit').addEventListener('click', authSubmit);
     $('#auth-switch').addEventListener('click', () => {
@@ -756,6 +767,15 @@
     });
     $('#auth-skip').addEventListener('click', () => { showScreen('home'); renderHome(); });
     $('#btn-logout').addEventListener('click', logout);
+    
+    // ДОБАВЛЯЕМ КНОПКУ ВОЙТИ:
+    $('#btn-login').addEventListener('click', () => {
+      if (!S.supabase) {
+        toast('Supabase не настроен. Проверьте config.js', 'gold');
+        return;
+      }
+      showScreen('auth');
+    });
 
     // Home
     $$('.home-btn').forEach(b => b.addEventListener('click', () => {
